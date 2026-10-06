@@ -1,0 +1,647 @@
+/* =========================
+   Tokens
+========================= */
+
+:root {
+  --bg: #ffffff;
+  --surface: #f4f4f5;
+  --card: #ffffff;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --text: #18181b;
+  --text-muted: #71717a;
+
+  --accent: #18181b;
+  --accent-text: #ffffff;
+
+  --ok: #16a34a;
+  --ok-bg: #f0fdf4;
+  --ok-text: #15803d;
+
+  --warn: #f97316;
+  --warn-text: #c2410c;
+
+  --err: #ef4444;
+  --err-bg: #fef2f2;
+  --err-text: #b91c1c;
+
+  --idle: #a1a1aa;
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181b;
+    --surface: #27272a;
+    --card: #202023;
+    --border: #3f3f46;
+    --border-strong: #52525b;
+
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+
+    --accent: #fafafa;
+    --accent-text: #18181b;
+
+    --ok: #22c55e;
+    --ok-bg: #052e16;
+    --ok-text: #86efac;
+
+    --warn-text: #fdba74;
+
+    --err-bg: #450a0a;
+    --err-text: #fca5a5;
+
+    --ring: 0 0 0 2px var(--bg), 0 0 0 4px #60a5fa;
+  }
+}
+
+
+/* =========================
+   Base
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+
+  font-size: 14px;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+
+/* =========================
+   App
+========================= */
+
+.app {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-bottom: 20px;
+}
+
+/* Everything under the status bar gets the side gutter */
+.app > :not(.status-bar) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+
+/* =========================
+   Status bar
+========================= */
+
+.status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  min-height: 52px;
+
+  padding: 10px 16px;
+
+  background: var(--bg);
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: color 0.2s;
+}
+
+.status-main {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+}
+
+.status-dot {
+  flex: 0 0 auto;
+
+  width: 9px;
+  height: 9px;
+
+  margin-right: 9px;
+
+  border-radius: 50%;
+
+  background: var(--idle);
+
+  transition: background-color 0.2s;
+}
+
+/* Waiting + connecting: soft pulse */
+.status-bar[data-state="waiting"] .status-dot,
+.status-bar[data-state="connecting"] .status-dot {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.status-bar[data-state="connecting"] {
+  color: var(--warn-text);
+}
+
+.status-bar[data-state="connecting"] .status-dot {
+  background: var(--warn);
+}
+
+/* Connected: slow ripple for as long as the phone is connected */
+.status-bar[data-state="connected"] {
+  color: var(--ok-text);
+}
+
+.status-bar[data-state="connected"] .status-dot {
+  background: var(--ok);
+
+  animation: dot-ripple 2.2s ease-out infinite;
+}
+
+.status-bar[data-state="error"] {
+  color: var(--err-text);
+}
+
+.status-bar[data-state="error"] .status-dot {
+  background: var(--err);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+@keyframes dot-ripple {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+
+/* Disconnect (inside the bar) */
+
+#disconnectButton {
+  flex: 0 0 auto;
+
+  height: 30px;
+
+  padding: 0 12px;
+
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--text-muted);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+#disconnectButton:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+#disconnectButton.confirm {
+  border-color: var(--err);
+  background: var(--err-bg);
+  color: var(--err-text);
+}
+
+
+/* =========================
+   Views
+========================= */
+
+.view {
+  margin-top: 24px;
+
+  text-align: center;
+
+  animation: view-in 0.18s ease-out;
+}
+
+@keyframes view-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.view h1 {
+  margin: 0;
+
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+
+.description {
+  margin: 8px auto 20px;
+
+  max-width: 280px;
+
+  color: var(--text-muted);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================
+   QR
+========================= */
+
+/* Always dark on white so it scans in dark mode */
+.qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 224px;
+  height: 224px;
+
+  margin: 0 auto 14px;
+
+  padding: 10px;
+
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.qr canvas,
+.qr img {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.caption {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.session-info {
+  margin: 6px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+  font-weight: 500;
+
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================
+   Flow: Scan → Choose files → Send
+========================= */
+
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+  gap: 4px 10px;
+
+  margin: 22px 0 0;
+  padding-top: 16px;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+.flow-arrow {
+  color: var(--border-strong);
+}
+
+
+/* =========================
+   Connected (empty state)
+========================= */
+
+.drop-hint {
+  padding: 40px 16px;
+
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 14px;
+
+  color: var(--text-muted);
+}
+
+.drop-hint p {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.drop-hint .drop-hint-sub {
+  margin-top: 6px;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Once files arrive, the list takes over */
+.app:has(#filesSection:not([hidden])) #connectedSection {
+  display: none;
+}
+
+
+/* =========================
+   Message
+========================= */
+
+.message-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  margin: 24px auto 16px;
+
+  border-radius: 50%;
+
+  background: var(--err-bg);
+  color: var(--err);
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.message-icon[data-tone="success"] {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.primary-button {
+  height: 40px;
+
+  padding: 0 20px;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: var(--accent);
+  color: var(--accent-text);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: opacity 0.15s;
+}
+
+.primary-button:hover {
+  opacity: 0.88;
+}
+
+.primary-button:active {
+  opacity: 0.75;
+}
+
+
+/* =========================
+   Received files
+========================= */
+
+.files-section {
+  margin-top: 18px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+.section-header h2 {
+  margin: 0;
+
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+
+.section-header button {
+  min-height: 30px;
+
+  border: 0;
+  border-radius: 7px;
+
+  padding: 4px 10px;
+
+  background: transparent;
+  color: var(--text-muted);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.section-header button:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 9px;
+
+  background: var(--card);
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  animation: view-in 0.18s ease-out;
+}
+
+.file-item.failed {
+  border-color: var(--err);
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  background: var(--surface);
+
+  font-size: 21px;
+}
+
+.thumb img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.meta {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.name {
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sub {
+  margin-top: 3px;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.failed .sub {
+  color: var(--err-text);
+}
+
+.state {
+  flex: 0 0 auto;
+
+  color: var(--ok);
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.failed .state {
+  color: var(--err);
+}
+
+.progress {
+  width: 100%;
+  height: 3px;
+
+  margin-top: 6px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: var(--border);
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+
+  background: var(--accent);
+
+  transition: width 0.15s linear;
+}
+
+.file-item:not(.receiving) .progress {
+  display: none;
+}
+
+
+/* =========================
+   Motion + hidden
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}

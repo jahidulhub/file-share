@@ -1,0 +1,677 @@
+/* =========================
+   Tokens (same as the Chrome panel)
+========================= */
+
+:root {
+  --bg: #ffffff;
+  --surface: #f4f4f5;
+  --card: #ffffff;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --text: #18181b;
+  --text-muted: #71717a;
+
+  --accent: #18181b;
+  --accent-text: #ffffff;
+
+  --ok: #16a34a;
+  --ok-text: #15803d;
+
+  --warn: #f97316;
+  --warn-text: #c2410c;
+
+  --err: #ef4444;
+  --err-text: #b91c1c;
+
+  --idle: #a1a1aa;
+
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181b;
+    --surface: #27272a;
+    --card: #202023;
+    --border: #3f3f46;
+    --border-strong: #52525b;
+
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+
+    --accent: #fafafa;
+    --accent-text: #18181b;
+
+    --ok: #22c55e;
+    --ok-text: #86efac;
+
+    --warn-text: #fdba74;
+
+    --err-text: #fca5a5;
+
+    --ring: 0 0 0 2px var(--bg), 0 0 0 4px #60a5fa;
+  }
+}
+
+
+/* =========================
+   Base
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+
+  font-size: 15px;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible,
+.action:focus-within {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+
+/* =========================
+   App
+========================= */
+
+.app {
+  width: 100%;
+  max-width: 520px;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Everything between the bars gets the side gutter */
+.app > :not(.status-bar):not(.action-bar) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+
+/* =========================
+   Status bar
+========================= */
+
+.status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  min-height: 56px;
+
+  padding: 10px 16px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+
+  background: var(--bg);
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: color 0.2s;
+}
+
+.status-main {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+}
+
+.status-main > span:last-child {
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status-dot {
+  flex: 0 0 auto;
+
+  width: 10px;
+  height: 10px;
+
+  margin-right: 10px;
+
+  border-radius: 50%;
+
+  background: var(--idle);
+
+  transition: background-color 0.2s;
+}
+
+/* Waiting: soft pulse */
+.status-bar[data-state="waiting"] .status-dot {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* Connecting: amber, pulsing */
+.status-bar[data-state="connecting"] {
+  color: var(--warn-text);
+}
+
+.status-bar[data-state="connecting"] .status-dot {
+  background: var(--warn);
+
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Connected: slow ripple */
+.status-bar[data-state="connected"] {
+  color: var(--ok-text);
+}
+
+.status-bar[data-state="connected"] .status-dot {
+  background: var(--ok);
+
+  animation: dot-ripple 2.2s ease-out infinite;
+}
+
+/* Error */
+.status-bar[data-state="error"] {
+  color: var(--err-text);
+}
+
+.status-bar[data-state="error"] .status-dot {
+  background: var(--err);
+}
+
+/* Offline: hollow dot */
+.status-bar[data-state="offline"] .status-dot {
+  background: transparent;
+
+  box-shadow: inset 0 0 0 2px var(--idle);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+@keyframes dot-ripple {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+
+/* Leave (inside the bar) */
+
+.bar-button {
+  flex: 0 0 auto;
+
+  height: 34px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+
+  background: transparent;
+  color: var(--text-muted);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.bar-button:active {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* No point leaving a session that has already ended */
+.app:has(#messageSection:not([hidden])) #disconnectButton {
+  display: none;
+}
+
+
+/* =========================
+   Views
+========================= */
+
+.view {
+  margin-top: 24px;
+
+  animation: view-in 0.18s ease-out;
+}
+
+@keyframes view-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Connecting + ended screens */
+.view.center {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  margin-top: 0;
+  padding: 48px 0 24px;
+
+  text-align: center;
+}
+
+/* Centered on the page when there is no file list */
+.app:has(#filesSection[hidden]) .view.center {
+  flex: 1;
+
+  justify-content: center;
+
+  padding-top: 24px;
+}
+
+.view h1 {
+  margin: 0;
+
+  font-size: 23px;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+
+.description {
+  margin: 8px auto 0;
+
+  max-width: 300px;
+
+  color: var(--text-muted);
+
+  line-height: 1.5;
+}
+
+.lead {
+  margin: 18px 0 0;
+
+  max-width: 280px;
+
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+
+/* =========================
+   Connecting
+========================= */
+
+.spinner {
+  width: 36px;
+  height: 36px;
+
+  border: 3px solid var(--border);
+  border-top-color: var(--text-muted);
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* =========================
+   Connected (empty state)
+========================= */
+
+.empty-hint {
+  padding: 44px 16px;
+
+  text-align: center;
+
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 14px;
+
+  color: var(--text-muted);
+}
+
+.empty-hint p {
+  margin: 0;
+}
+
+.empty-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.empty-sub {
+  margin-top: 6px !important;
+
+  font-size: 13px;
+}
+
+/* Once files exist, the list takes over */
+.app:has(#filesSection:not([hidden])) #transferSection {
+  display: none;
+}
+
+
+/* =========================
+   Session ended
+========================= */
+
+.message-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 60px;
+  height: 60px;
+
+  margin-bottom: 18px;
+
+  border-radius: 50%;
+
+  /* Neutral: the same icon is used for "!" and "✓" */
+  background: var(--surface);
+  color: var(--text-muted);
+
+  font-size: 26px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   Files
+========================= */
+
+.files-section {
+  margin-top: 18px;
+  margin-bottom: 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+.section-header h2 {
+  margin: 0;
+
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+
+.section-header button {
+  min-height: 36px;
+
+  border: 0;
+  border-radius: 8px;
+
+  padding: 4px 12px;
+
+  background: transparent;
+  color: var(--text-muted);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.section-header button:active {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 0;
+
+  padding: 11px;
+
+  background: var(--card);
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  animation: view-in 0.18s ease-out;
+}
+
+.file-item.failed {
+  border-color: var(--err);
+}
+
+.thumb {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 9px;
+
+  background: var(--surface);
+
+  font-size: 21px;
+}
+
+.thumb img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.meta {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.name {
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sub {
+  margin-top: 3px;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.failed .sub {
+  color: var(--err-text);
+}
+
+.state {
+  width: 20px;
+
+  flex: 0 0 20px;
+
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.file-item.done .state {
+  color: var(--ok);
+}
+
+.file-item.failed .state {
+  color: var(--err);
+}
+
+.progress {
+  width: 100%;
+  height: 3px;
+
+  margin-top: 7px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: var(--border);
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+
+  background: var(--accent);
+
+  transition: width 0.15s linear;
+}
+
+.file-item:not(.receiving) .progress {
+  display: none;
+}
+
+
+/* =========================
+   Action bar
+========================= */
+
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+
+  display: flex;
+
+  margin-top: auto;
+
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+
+  background: var(--bg);
+
+  border-top: 1px solid var(--border);
+}
+
+.action {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 52px;
+
+  border-radius: 12px;
+
+  background: var(--accent);
+  color: var(--accent-text);
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: opacity 0.15s;
+}
+
+.action:active {
+  transform: scale(0.98);
+}
+
+/* Disabled until connected (transfer section is shown) */
+.app:has(#transferSection[hidden]) .action {
+  opacity: 0.4;
+
+  pointer-events: none;
+}
+
+/* Hidden on the ended screen */
+.app:has(#messageSection:not([hidden])) .action-bar {
+  display: none;
+}
+
+
+/* =========================
+   Motion + hidden
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}

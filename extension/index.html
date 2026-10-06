@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+
+  <title>File Share</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- Status bar: the only status signal. Disconnect lives here. -->
+    <header
+      id="connectionBadge"
+      class="status-bar"
+      data-state="waiting"
+    >
+
+      <span class="status-main" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="connectionText">Waiting for phone</span>
+      </span>
+
+      <button id="disconnectButton" type="button" hidden>
+        Disconnect
+      </button>
+
+    </header>
+
+
+    <!-- QR / Waiting view -->
+    <section id="qrSection" class="view">
+
+      <div
+        id="qr"
+        class="qr"
+        role="img"
+        aria-label="QR code to connect your phone"
+      ></div>
+
+      <p class="caption">Scan with your phone camera</p>
+
+      <div id="sessionInfo" class="session-info" hidden></div>
+
+      <p class="flow">
+        <span>Scan</span>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <span>Choose files</span>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <span>Send</span>
+      </p>
+
+    </section>
+
+
+    <!-- Connected view (empty state, hidden once files arrive) -->
+    <section id="connectedSection" class="view" hidden>
+
+      <div class="drop-hint">
+        <p>Files you send will appear here</p>
+        <p class="drop-hint-sub">They save to your Downloads folder.</p>
+      </div>
+
+    </section>
+
+
+    <!-- Message view -->
+    <section id="messageSection" class="view" hidden>
+
+      <div id="messageIcon" class="message-icon" aria-hidden="true">!</div>
+
+      <h1 id="messageTitle">Session ended</h1>
+
+      <p id="messageText" class="description">
+        The session is no longer available.
+      </p>
+
+      <button id="newSessionButton" class="primary-button" type="button">
+        New session
+      </button>
+
+    </section>
+
+
+    <!-- Received files -->
+    <section id="filesSection" class="files-section" hidden>
+
+      <div class="section-header">
+        <h2>Received files</h2>
+
+        <button id="clearFilesButton" type="button">
+          Clear
+        </button>
+      </div>
+
+      <div id="fileList" class="file-list"></div>
+
+    </section>
+
+  </main>
+
+
+  <script src="qrcode.min.js"></script>
+  <script type="module" src="app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta name="color-scheme" content="light dark">
+
+  <meta
+    name="theme-color"
+    content="#ffffff"
+    media="(prefers-color-scheme: light)"
+  >
+
+  <meta
+    name="theme-color"
+    content="#18181b"
+    media="(prefers-color-scheme: dark)"
+  >
+
+  <title>File Share</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+  <main class="app">
+
+
+    <!-- Status bar: the only status signal -->
+
+    <header
+      id="connectionBadge"
+      class="status-bar"
+      data-state="waiting"
+    >
+
+      <span
+        class="status-main"
+        role="status"
+        aria-live="polite"
+      >
+
+        <span
+          class="status-dot"
+          aria-hidden="true"
+        ></span>
+
+        <span id="connectionText">
+          Connecting...
+        </span>
+
+      </span>
+
+      <button
+        id="disconnectButton"
+        class="bar-button"
+        type="button"
+        onclick="history.length > 1 ? history.back() : window.close()"
+      >
+        Leave
+      </button>
+
+    </header>
+
+
+    <!-- Connecting / waiting -->
+
+    <section
+      id="connectionSection"
+      class="view center"
+    >
+
+      <div
+        class="spinner"
+        aria-hidden="true"
+      ></div>
+
+      <p
+        id="connectionMessage"
+        class="lead"
+      >
+        Connecting to your computer...
+      </p>
+
+    </section>
+
+
+    <!-- Connected, nothing sent yet
+         (hidden by CSS once files exist) -->
+
+    <section
+      id="transferSection"
+      class="view"
+      hidden
+    >
+
+      <div class="empty-hint">
+
+        <p class="empty-title">
+          Nothing sent yet
+        </p>
+
+        <p class="empty-sub">
+          Photos, videos, PDFs and other files
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- Files -->
+
+    <section
+      id="filesSection"
+      class="files-section"
+      hidden
+    >
+
+      <div class="section-header">
+
+        <h2>
+          Files
+        </h2>
+
+        <button
+          id="clearFilesButton"
+          type="button"
+        >
+          Clear
+        </button>
+
+      </div>
+
+      <div
+        id="fileList"
+        class="file-list"
+      ></div>
+
+    </section>
+
+
+    <!-- Session ended -->
+
+    <section
+      id="messageSection"
+      class="view center"
+      hidden
+    >
+
+      <div
+        id="messageIcon"
+        class="message-icon"
+        aria-hidden="true"
+      >
+        !
+      </div>
+
+      <h1 id="messageTitle">
+        Connection ended
+      </h1>
+
+      <p
+        id="messageText"
+        class="description"
+      >
+        The sharing session is no longer available.
+      </p>
+
+      <!-- Later: "Scan QR code" button goes here -->
+
+    </section>
+
+
+    <!-- Actions, pinned to the bottom
+         (disabled by CSS until connected) -->
+
+    <footer class="action-bar">
+
+      <label
+        class="action"
+        for="fileInput"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 16V4"/>
+          <path d="M7 9l5-5 5 5"/>
+          <path d="M5 20h14"/>
+        </svg>
+
+        Upload files
+
+      </label>
+
+      <input
+        id="fileInput"
+        type="file"
+        multiple
+        hidden
+      >
+
+    </footer>
+
+  </main>
+
+
+  <script
+    type="module"
+    src="js/app.js"
+  ></script>
+
+</body>
+
+</html>
