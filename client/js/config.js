@@ -1,7 +1,7 @@
 // client/js/config.js
 
-const SERVER_URL =
-  `${location.protocol}//${location.host}`;
+const SERVER_URL = 
+  "http://192.168.0.6:3000";
 
 
 const params =

@@ -10,6 +10,9 @@ export const qrElement =
     "qr"
   );
 
+export const urlElement = document.getElementById("url");
+
+
 
 export const connectionBadge =
   document.getElementById(
@@ -266,15 +269,18 @@ export function renderQr(
         url,
 
       width:
-        154,
+        100,
 
       height:
-        154,
+        100,
 
       correctLevel:
         QRCode.CorrectLevel.M
     }
   );
+
+  urlElement.textContent =
+    url;
 
 }
 

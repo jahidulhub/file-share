@@ -1,7 +1,7 @@
 import {
   SESSION_MS,
   SESSION_STORAGE_KEY,
-  SERVER_URL
+  CLIENT_URL
 } from "./config.js";
 
 
@@ -253,7 +253,7 @@ export function getPhoneUrl() {
 
 
   return (
-    `${SERVER_URL}/?room=${session.roomId}`
+    `${CLIENT_URL}?room=${session.roomId}`
   );
 
 }

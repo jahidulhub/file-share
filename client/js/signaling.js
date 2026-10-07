@@ -6,7 +6,8 @@ import {
 } from "./state.js";
 
 import {
-  roomFromUrl
+  roomFromUrl,
+  SERVER_URL
 } from "./config.js";
 
 
@@ -94,15 +95,11 @@ export function connectSignalingServer(
     onMessage;
 
 
-  const protocol =
-    location.protocol ===
-      "https:"
-      ? "wss:"
-      : "ws:";
-
-
   const socketUrl =
-    `${protocol}//${location.host}`;
+    SERVER_URL.replace(
+      /^http/,
+      "ws"
+    );
 
 
   console.log(
